@@ -1,1 +1,45 @@
 
+Question 1: 
+a. 
+module MEM;
+  // Module internals would go here.
+endmodule
+
+module SC;
+  // Module internals would go here.
+endmodule
+
+module Xbar;
+  // Module internals would go here.
+endmodule
+
+b.
+module IS;
+  MEM mem1();
+  SC sc1();
+  Xbar xbar1();
+  // No terminals, so no need to connect the instances to anything.
+endmodule
+
+c.
+module Top;
+  IS is1();
+  // The stimulus for testing the IS block would go here.
+endmodule
+
+Question 2:
+a. 
+module FA;
+  // Internals of the FA would go here, but are not defined per instructions.
+endmodule
+
+b.
+module Ripple_Add;
+  FA fa0;
+  FA fa1;
+  FA fa2;
+  FA fa3;
+  // Connections between FAs to form a ripple carry adder would go here, but are not defined per instructions.
+endmodule
+
+
