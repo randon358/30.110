@@ -1,1 +1,40 @@
+Question 1:
+a. 8'b0111_1011
+
+b. 16'hxxxx
+
+c. 
+4'd2 //decimal number 
+4'b0010 //binary number 
+-4'd2 //decimal number for negative 2 
+4'b1110 //binary number for negative 2 in 2's completement format 
+
+d. 32'h1234
+
+Question 4:
+a.
+wire [7:0] a_in;
+
+b.
+reg [31:0] address = 32'd3;
+
+c. integer cout;
+
+d. 
+time snap_shot;
+
+e. 
+integer delays [19:0],
+
+f.
+reg [63:0] MEM[255:0];
+
+g.
+parameter cache_size=512
+
+Question 5:
+a. The current value of latch =4'b1100
+b. In register value = 3'b010
+c. The maximum memory size is h'400
+
 
