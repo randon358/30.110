@@ -1,1 +1,47 @@
+Question 1: 
+//Behavioral Modelling: Clock
+module oscillate_tb;
+    reg oscillate;
+
+    initial begin
+        oscillate = 0; // Initialize to 0
+        forever #30 oscillate = ~oscillate; // Toggle every 30 time units
+    end
+
+    initial begin
+        $dumpfile("oscillate.vcd");
+        $dumpvars(0, oscillate_tb);
+
+        #151 $finish; // End simulation after a specific time
+    end
+
+    initial begin
+        $monitor($time, " oscillate=%b", oscillate);
+    end
+endmodule
+
+Question 2:
+//Clock design with period = 40, duty cycle 25%, always and initial statements, value of clock at time=0 is 0
+module d25_tb;
+    reg clock;
+
+    initial clock = 0;
+
+    always begin
+        #10 clock = 1;  // Clock high for 10 time units
+        #30 clock = 0;  // Clock low for 30 time units
+    end
+
+    initial begin
+        $dumpfile("d25.vcd");
+        $dumpvars(0, d25_tb);
+        #121 $finish; // Finish the simulation after some cycles
+    end
+
+    initial begin
+        $monitor($time, " clock=%b", clock);
+    end
+endmodule
+
+Question 3: 
 
