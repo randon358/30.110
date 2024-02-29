@@ -1,45 +1,45 @@
 Question 1: 
 
 //Module description
-module full_subtractor(
-    input x,
-    input y,
-    input z,
-    output reg D,
-    output reg B
-);
-
-always @(*) begin
-    D = (~x & y & z) | (x & ~y & z) | (x & y & ~z) | (~x & ~y & ~z);
-    B = (~x & ~y) | (y & z) | (~x & z);
-end
-
+module full_subtractor(input x, input y, input z, output reg D, output reg B);
+    always @(*) begin
+        D = (~x & y & z) | (x & ~y & z) | (x & y & ~z) | (~x & ~y & ~z);
+        B = (~x & y) | (~x & z) | (y & z);
+    end
 endmodule
 
+
 //testbench
-module testbench;
+module full_subtractor_tb;
     reg x, y, z;
     wire D, B;
 
     // Instantiate the full subtractor
-    full_subtractor uut(
-        .x(x),
-        .y(y),
-        .z(z),
-        .D(D),
-        .B(B)
-    );
+    full_subtractor fs(.x(x), .y(y), .z(z), .D(D), .B(B));
+
+    // Initialize all inputs to 0
+    initial begin
+        x = 0; y = 0; z = 0;
+    end
+
+    // Test all eight combinations of inputs
+    initial begin
+        $monitor($time, " x=%b, y=%b, z=%b, D=%b, B=%b", x, y, z, D, B);
+        #10 {x, y, z} = 3'b001;
+        #10 {x, y, z} = 3'b010;
+        #10 {x, y, z} = 3'b011;
+        #10 {x, y, z} = 3'b100;
+        #10 {x, y, z} = 3'b101;
+        #10 {x, y, z} = 3'b110;
+        #10 {x, y, z} = 3'b111;
+        #10 $finish;
+    end
 
     initial begin
-        // Test all possible combinations of x, y, and z
-        $display("x y z | D B");
-        for (int i = 0; i < 8; i++) begin
-            {x, y, z} = i[2:0];
-            #10; // Wait for the outputs to settle
-            $display("%b %b %b | %b %b", x, y, z, D, B);
-        end
-
-        #10 $finish; // Finish the simulation after all tests
+        // Generate a VCD file for waveform analysis
+        $dumpfile("full_subtractor_tb.vcd");
+        $dumpvars(0, full_subtractor_tb);
     end
 endmodule
+
 
