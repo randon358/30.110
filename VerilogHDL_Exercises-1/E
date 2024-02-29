@@ -4,7 +4,7 @@ module oscillate_tb;
     reg oscillate;
 
     initial begin
-        oscillate = 0; // Initialize to 0
+        oscillate = 1'b0;
         forever #30 oscillate = ~oscillate; // Toggle every 30 time units
     end
 
@@ -17,7 +17,7 @@ module oscillate_tb;
 
     initial begin
         $monitor($time, " oscillate=%b", oscillate);
-    end
+end
 endmodule
 
 Question 2:
@@ -28,8 +28,8 @@ module d25_tb;
     initial clock = 0;
 
     always begin
-        #10 clock = 1;  // Clock high for 10 time units
-        #30 clock = 0;  // Clock low for 30 time units
+        #30 clock = ~clock;  
+        #10 clock = ~clock;  
     end
 
     initial begin
@@ -44,4 +44,234 @@ module d25_tb;
 endmodule
 
 Question 3: 
+//checking simulation time when each statement is executed, what are the intermediate and final values of abcd. testbench to dislay results using $monitor and waveform
+//blocking assignment
+module abcd_tb;
+    reg a, b, c;
+    reg [2:0] d;
+
+    initial begin
+        a = 1'b0; // Blocking assignment
+        b = #10 1'b1; // Delayed blocking assignment
+        c = #5 1'b0; // Delayed blocking assignment
+        d = #20 {a, b, c}; // Delayed blocking assignment
+    end
+
+    initial begin
+        $dumpfile("abcd_tb.vcd");
+        $dumpvars(0, abcd_tb);
+        #36 $finish;
+    end
+
+    initial begin
+        $monitor($time, " a=%b b=%b c=%b d=%b", a, b, c, d);
+    end
+endmodule
+
+//nonblocking
+module abcd1_tb;
+    reg a, b, c;
+    reg [2:0] d;
+
+    // Initial block with non-blocking assignments
+    initial begin
+        a <= 1'b0;
+        b <= #10 1'b1;
+        c <= #5 1'b0;
+        d <= #20 {a, b, c};  // Non-blocking assignment happens concurrently
+    end
+
+    // Finish the simulation after 36 time units
+    initial begin
+        $dumpfile("abcd1.vcd");
+        $dumpvars(0, abcd1_tb);
+        #36 $finish;
+    end
+
+    // Monitor the values of a, b, c, and d every time they change
+    initial begin
+        $monitor($time, " a=%b b=%b c=%b d=%b", a, b, c, d);
+    end
+endmodule
+
+Question 7 and 8:
+//D flip-flop with synchronous clear, active high 
+//module
+module dff_sync_clear(q, d, clock, clear);
+    output reg q;
+    input d, clock, clear;
+
+    always @(negedge clock) begin
+        if (clear)
+            q <= 1'b0;
+        else
+            q <= d;
+    end
+endmodule
+
+//D flipflop with asynchronous clear
+//module
+module dff_async_clear(q, d, clock, clear);
+    output reg q;
+    input d, clock, clear;
+
+    always @(negedge clock or posedge clear) begin
+        if (clear)
+            q <= 1'b0;
+        else
+            q <= d;
+    end
+endmodule
+
+
+//testbench
+module dff_testbench;
+    wire q_sync, q_async;
+    reg d, clock, clear;
+
+    // Instantiate both D flip-flops
+    dff_sync_clear dff_sc(q_sync, d, clock, clear);
+    dff_async_clear dff_ac(q_async, d, clock, clear);
+
+    // Generate a clock with a period of 10 time units
+    initial begin
+        clock = 1'b0;
+        forever #5 clock = ~clock; // Toggle every 5 units for a 10-unit period
+    end
+
+    // Test sequence
+    initial begin
+        // Initialize inputs
+        clear = 1'b0;
+        d = 1'b0;
+
+        // Create a VCD file for waveform analysis
+        $dumpfile("dff_testbench.vcd");
+        $dumpvars(0, dff_testbench);
+
+        // Test the flip-flops
+        #7 d = 1'b1; // Change D input before the clock edge
+        #10 clear = 1'b1; // Activate synchronous clear on clock edge
+        #10 clear = 1'b0; // Deactivate clear
+        #30 d = 1'b0; // Change D input again before the clock edge
+        #40 clear = 1'b1; // Activate asynchronous clear
+        #2 clear = 1'b0; // Deactivate clear, asynchronously
+        #18 $finish; // End simulation after some cycles
+    end
+
+    // Monitor changes and print them to the console
+    initial begin
+        $monitor($time, " Clock=%b, Clear=%b, D=%b | Q_sync=%b, Q_async=%b", clock, clear, d, q_sync, q_async);
+    end
+endmodule
+
+Question 10:
+//4to1 multiplexer using ifandelse, case statements 
+
+//ifelse module 
+module mux4to1_if(out, i3, i2, i1, i0, sel);
+    output reg [1:0] out;
+    input [1:0] i3, i2, i1, i0;
+    input [1:0] sel;
+
+    always @(*) begin
+        if (sel == 2'b00) 
+            out = i0;
+        else if (sel == 2'b01) 
+            out = i1;
+        else if (sel == 2'b10) 
+            out = i2;
+        else if (sel == 2'b11) 
+            out = i3;
+        else 
+            out = 2'bx;
+    end
+endmodule
+
+//testbench
+module mux4to1_tb;
+    wire [1:0] out;
+    reg [1:0] i3, i2, i1, i0;
+    reg [1:0] sel;
+
+    // Instantiate the multiplexer using if-else (toggle the comment to use the case version)
+    mux4to1_if dut(out, i3, i2, i1, i0, sel);
+    // mux4to1_case dut(out, i3, i2, i1, i0, sel); // Uncomment to test the case version
+
+    initial begin
+        // Initialize inputs
+        i0 = 2'b00; i1 = 2'b01; i2 = 2'b10; i3 = 2'b11;
+
+        // Create a VCD file for waveform analysis
+        $dumpfile("mux4to1.vcd");
+        $dumpvars(0, mux4to1_tb);
+
+        // Test the multiplexer with different select inputs
+        #10 sel = 2'b00;
+        #10 sel = 2'b01;
+        #10 sel = 2'b10;
+        #10 sel = 2'b11;
+        #10 $finish; // End the simulation
+    end
+
+    // Monitor changes and print them to the console
+    initial begin
+        $monitor($time, " Select=%b, Output=%b", sel, out);
+    end
+endmodule
+
+
+
+//case
+module mux4to1_case(out, i3, i2, i1, i0, sel);
+    output reg [1:0] out;
+    input [1:0] i3, i2, i1, i0;
+    input [1:0] sel;
+
+    always @(*) begin
+        case (sel)
+            2'b00: out = i0;
+            2'b01: out = i1;
+            2'b10: out = i2;
+            2'b11: out = i3;
+            default: out = 2'bx;
+        endcase
+    end
+endmodule
+
+
+
+//testbench
+module mux4to1_tb;
+    wire [1:0] out;
+    reg [1:0] i3, i2, i1, i0;
+    reg [1:0] sel;
+
+    // Instantiate the multiplexer using if-else (toggle the comment to use the case version)
+    mux4to1_if dut(out, i3, i2, i1, i0, sel);
+    // mux4to1_case dut(out, i3, i2, i1, i0, sel); // Uncomment to test the case version
+
+    initial begin
+        // Initialize inputs
+        i0 = 2'b00; i1 = 2'b01; i2 = 2'b10; i3 = 2'b11;
+
+        // Create a VCD file for waveform analysis
+        $dumpfile("mux4to1.vcd");
+        $dumpvars(0, mux4to1_tb);
+
+        // Test the multiplexer with different select inputs
+        #10 sel = 2'b00;
+        #10 sel = 2'b01;
+        #10 sel = 2'b10;
+        #10 sel = 2'b11;
+        #10 $finish; // End the simulation
+    end
+
+    // Monitor changes and print them to the console
+    initial begin
+        $monitor($time, " Select=%b, Output=%b", sel, out);
+    end
+endmodule
+
+
 
