@@ -1,45 +1,35 @@
-Question 1: 
+//module
+module fs(B, D, x, y, z);
+    output reg B, D;
+    input x, y, z;
 
-//Module description
-module full_subtractor(input x, input y, input z, output reg D, output reg B);
     always @(*) begin
-        D = (~x & y & z) | (x & ~y & z) | (x & y & ~z) | (~x & ~y & ~z);
-        B = (~x & y) | (~x & z) | (y & z);
+        D <= (~x & y & z) | (~x & ~y & ~z) | (x & ~y & ~z) | (x & y & z);
+        B <= (~x & y) | (~x & z) | (y & z);
     end
 endmodule
 
 
 //testbench
-module full_subtractor_tb;
+module main;
+    wire Bt, Dt;
     reg x, y, z;
-    wire D, B;
 
     // Instantiate the full subtractor
-    full_subtractor fs(.x(x), .y(y), .z(z), .D(D), .B(B));
+    fs fs1(Bt, Dt, x, y, z);
 
-    // Initialize all inputs to 0
+    // Test sequence
+    initial x = 0; always #40 x = ~x;
+    initial y = 0; always #20 y = ~y;
+    initial z = 0; always #10 z = ~z;
+
+    // Finish the simulation after a certain time
     initial begin
-        x = 0; y = 0; z = 0;
+        #71 $finish;
     end
 
-    // Test all eight combinations of inputs
+    // Monitor the outputs
     initial begin
-        $monitor($time, " x=%b, y=%b, z=%b, D=%b, B=%b", x, y, z, D, B);
-        #10 {x, y, z} = 3'b001;
-        #10 {x, y, z} = 3'b010;
-        #10 {x, y, z} = 3'b011;
-        #10 {x, y, z} = 3'b100;
-        #10 {x, y, z} = 3'b101;
-        #10 {x, y, z} = 3'b110;
-        #10 {x, y, z} = 3'b111;
-        #10 $finish;
-    end
-
-    initial begin
-        // Generate a VCD file for waveform analysis
-        $dumpfile("full_subtractor_tb.vcd");
-        $dumpvars(0, full_subtractor_tb);
+        $monitor($time, " B=%b, D=%b | x=%b, y=%b, z=%b", Bt, Dt, x, y, z);
     end
 endmodule
-
-
