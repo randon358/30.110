@@ -1,1 +1,36 @@
+Question 1:
+//Basic components:
+Module Name, Port List, Port Declarations, Parameters, Declarations of wires, regs and other variables, data flow statements, Instantiation of lower level modules, always and initial blocks, tasks and functions, endmodule statement
+//mandatory:
+module, module name, endmodule
 
+Question 3: 
+module shift_reg (reg_out, reg_in, clock);
+  output reg [3:0] reg_out;
+  input [3:0] reg_in;
+  input clock;
+
+end module 
+
+Question 4: 
+//by ordered list 
+module stimulus;
+  wire[3:0] REG_OUT;
+  reg [3:0] REG_IN;
+  reg CLK;
+  shift reg sr1 (REG_OUT, REG_IN, CLK);
+endmodule
+
+//by name list
+module stimulus;
+  wire[3:0] REG_OUT;
+  reg [3:0] REG_IN;
+  reg CLK;
+  shift_reg sr1(.reg_out(REG_OUT), .reg_in(REG_IN), .clock(CLK));
+endmodule
+
+Question 6:
+stimulus.REG_IN, stimulus.CLK, stimulus.REG_OUT
+
+Question 7: 
+stimulus.sr1, stimulus.s1.clock, stimulus.sr1.reg_in
